@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 from database import engine, get_db, Base
 from models import UserDB
@@ -15,10 +16,15 @@ from auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
 
-# Create tables
-Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create tables
+    Base.metadata.create_all(bind=engine)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:3000",
@@ -33,6 +39,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.post("/register", response_model=User)
 def register(user: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(UserDB).filter(UserDB.email == user.email).first()
@@ -44,6 +51,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     return db_user
+
 
 @app.post("/token", response_model=Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -60,9 +68,11 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 @app.get("/", response_model=dict)
 def read_root(current_user: User = Depends(get_current_user)):
     return {"message": "Welcome to the protected API!", "user": current_user.email}
+
 
 @app.get("/users/me", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_user)):
