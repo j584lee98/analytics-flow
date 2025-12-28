@@ -30,3 +30,59 @@ def setup_db():
 def test_read_main():
     response = client.get("/")
     assert response.status_code == 401  # Should be unauthorized without token
+
+
+def test_register_and_login():
+    # 1. Register
+    response = client.post(
+        "/register",
+        json={"username": "testuser", "email": "test@example.com", "password": "password123"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["email"] == "test@example.com"
+    assert data["username"] == "testuser"
+    assert "id" in data
+
+    # 2. Login
+    response = client.post(
+        "/token",
+        data={"username": "testuser", "password": "password123"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+    token = data["access_token"]
+
+    # 3. Access protected route
+    response = client.get(
+        "/",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json()["user"] == "testuser"
+
+
+def test_duplicate_registration():
+    # Register first user
+    client.post(
+        "/register",
+        json={"username": "user1", "email": "user1@example.com", "password": "password123"},
+    )
+
+    # Try to register with same email
+    response = client.post(
+        "/register",
+        json={"username": "user2", "email": "user1@example.com", "password": "password123"},
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Email already registered"
+
+    # Try to register with same username
+    response = client.post(
+        "/register",
+        json={"username": "user1", "email": "user2@example.com", "password": "password123"},
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Username already taken"

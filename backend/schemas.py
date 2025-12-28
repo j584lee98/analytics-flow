@@ -3,12 +3,14 @@ from typing import Optional
 
 
 class UserCreate(BaseModel):
+    username: str
     email: str
     password: str = Field(..., max_length=72)
 
 
 class User(BaseModel):
     id: int
+    username: str
     email: str
     is_active: bool
 
@@ -21,4 +23,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    email: Optional[str] = None
+    username: Optional[str] = None
