@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
@@ -21,7 +21,7 @@ export default function LoginPage() {
     setError('');
 
     const formData = new FormData();
-    formData.append('username', email);
+    formData.append('username', username);
     formData.append('password', password);
 
     try {
@@ -52,10 +52,10 @@ export default function LoginPage() {
       <h1 className="text-4xl font-bold mb-8">Login</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-md">
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           className="p-2 border rounded text-black"
           required
         />
