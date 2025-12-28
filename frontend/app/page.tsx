@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Sidebar from '../components/Sidebar';
 
 export default function Home() {
   const [message, setMessage] = useState('');
@@ -59,16 +60,13 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <h1 className="text-4xl font-bold mb-8">Home Page</h1>
-      <p className="text-xl mb-4">{message}</p>
-      <p className="text-lg mb-8">Logged in as: {user}</p>
-      <button
-        onClick={handleLogout}
-        className="p-2 bg-red-500 text-white rounded"
-      >
-        Logout
-      </button>
-    </main>
+    <div className="flex min-h-screen bg-gray-100">
+      <Sidebar onLogout={handleLogout} />
+      <main className="flex-1 p-8">
+        <h1 className="text-4xl font-bold mb-8">Home Page</h1>
+        <p className="text-xl mb-4">{message}</p>
+        <p className="text-lg mb-8">Logged in as: {user}</p>
+      </main>
+    </div>
   );
 }
