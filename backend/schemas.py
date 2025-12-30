@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
+from datetime import datetime
 
 
 class UserCreate(BaseModel):
@@ -24,3 +25,11 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+
+class FileResponse(BaseModel):
+    id: int
+    filename: str
+    upload_date: datetime
+
+    model_config = ConfigDict(from_attributes=True)

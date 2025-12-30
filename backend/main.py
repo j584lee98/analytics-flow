@@ -1,13 +1,15 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import shutil
+import os
 
 from database import engine, get_db, Base
-from models import UserDB
-from schemas import UserCreate, User, Token
+from models import UserDB, FileDB
+from schemas import UserCreate, User, Token, FileResponse
 from auth import (
     get_password_hash,
     verify_password,
@@ -56,6 +58,37 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+UPLOAD_DIR = "uploads"
+if not os.path.exists(UPLOAD_DIR):
+    os.makedirs(UPLOAD_DIR)
+
+
+@app.post("/upload", response_model=FileResponse)
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: UserDB = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if not file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="Only CSV files are allowed")
+
+    file_location = os.path.join(UPLOAD_DIR, f"{current_user.id}_{file.filename}")
+
+    with open(file_location, "wb+") as file_object:
+        shutil.copyfileobj(file.file, file_object)
+
+    db_file = FileDB(
+        filename=file.filename,
+        filepath=file_location,
+        owner_id=current_user.id
+    )
+    db.add(db_file)
+    db.commit()
+    db.refresh(db_file)
+
+    return db_file
 
 
 @app.post("/token", response_model=Token)
