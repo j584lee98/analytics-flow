@@ -26,11 +26,12 @@ export default function Home() {
         if (res.status === 401) {
           localStorage.removeItem('token');
           router.push('/login');
-          throw new Error('Unauthorized');
+          return null;
         }
         return res.json();
       })
       .then((data) => {
+        if (!data) return;
         setMessage(data.message);
         setIsLoading(false);
       })
