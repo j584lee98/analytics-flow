@@ -5,7 +5,7 @@ import time
 from sqlalchemy.exc import OperationalError
 
 from database import engine, Base
-from routers import auth, files
+from routers import auth, files, analytics
 from schemas import User
 from auth import get_current_user
 
@@ -44,6 +44,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(files.router)
+app.include_router(analytics.router)
 
 
 @app.get("/", response_model=dict)
