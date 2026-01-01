@@ -6,7 +6,7 @@ interface SidebarProps {
 
 export default function Sidebar({ onLogout }: SidebarProps) {
   return (
-    <div className="flex h-screen w-64 flex-col bg-gray-900 text-white">
+    <div className="flex h-full w-64 flex-col bg-gray-900 text-white">
       <div className="flex h-16 items-center justify-center border-b border-gray-800">
         <h1 className="text-xl font-bold">AnalyticsFlow</h1>
       </div>
@@ -18,14 +18,9 @@ export default function Sidebar({ onLogout }: SidebarProps) {
             </Link>
           </li>
           <li>
-            <span className="block rounded-md px-4 py-2 text-gray-500 cursor-not-allowed">
+            <Link href="/upload" className="block rounded-md px-4 py-2 hover:bg-gray-800">
               Datasets
-            </span>
-          </li>
-          <li>
-            <span className="block rounded-md px-4 py-2 text-gray-500 cursor-not-allowed">
-              Analytics
-            </span>
+            </Link>
           </li>
         </ul>
       </nav>
