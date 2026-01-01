@@ -285,13 +285,13 @@ export default function UploadPage() {
                       </Link>
                       <button
                         onClick={() => startEditing(file)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-blue-600 hover:text-blue-800 hover:cursor-pointer"
                       >
                         Rename
                       </button>
                       <button
                         onClick={() => handleDelete(file.id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 hover:text-red-800 hover:cursor-pointer"
                       >
                         Delete
                       </button>

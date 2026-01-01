@@ -86,7 +86,7 @@ export default function AnalyticsPage({ params }: { params: Promise<{ id: string
         <div className="mb-6">
           <button 
             onClick={() => router.push('/upload')} 
-            className="text-blue-600 hover:underline mb-2 inline-block"
+            className="text-blue-600 hover:underline mb-2 inline-block hover:cursor-pointer"
           >
             &larr; Back to Datasets
           </button>
