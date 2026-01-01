@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
 
 
 class User(BaseModel):
-    id: int
+    id: str
     username: str
     email: str
     is_active: bool
@@ -28,8 +28,12 @@ class TokenData(BaseModel):
 
 
 class FileResponse(BaseModel):
-    id: int
+    id: str
     filename: str
     upload_date: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class FileUpdate(BaseModel):
+    filename: str
