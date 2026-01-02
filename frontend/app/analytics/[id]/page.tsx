@@ -1,8 +1,12 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Sidebar from '../../../components/Sidebar';
+import type { PlotParams } from 'react-plotly.js';
+
+const Plot = dynamic(() => import('react-plotly.js'), { ssr: false }) as ComponentType<PlotParams>;
 
 interface FileData {
   id: string;
@@ -24,7 +28,11 @@ interface AnalyticsData {
 export default function AnalyticsPage({ params }: { params: Promise<{ id: string }> }) {
   const [file, setFile] = useState<FileData | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [chartData, setChartData] = useState<Record<string, (string | number | null)[]> | null>(null);
   const [selectedType, setSelectedType] = useState<string>('');
+  const [chartType, setChartType] = useState('bar');
+  const [xAxis, setXAxis] = useState('');
+  const [yAxis, setYAxis] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -70,6 +78,22 @@ export default function AnalyticsPage({ params }: { params: Promise<{ id: string
           const types = Array.from(new Set(analyticsData.columns.map((c: ColumnStats) => c.type)));
           if (types.length > 0) {
             setSelectedType(types[0] as string);
+          }
+        }
+
+        // Fetch chart data
+        const dataRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics/${fileId}/data`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (dataRes.ok) {
+          const data = await dataRes.json();
+          setChartData(data);
+          const keys = Object.keys(data);
+          if (keys.length > 0) {
+            setXAxis(keys[0]);
+            if (keys.length > 1) setYAxis(keys[1]);
+            else setYAxis(keys[0]);
           }
         }
 
@@ -129,6 +153,74 @@ export default function AnalyticsPage({ params }: { params: Promise<{ id: string
           <h1 className="text-3xl font-bold">Analytics for {file?.filename}</h1>
         </div>
         
+        {chartData && (
+          <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-semibold mb-4">Data Visualization</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Chart Type</label>
+                <select
+                  value={chartType}
+                  onChange={(e) => setChartType(e.target.value)}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                >
+                  <option value="bar">Bar Chart</option>
+                  <option value="scatter">Scatter Plot</option>
+                  <option value="line">Line Chart</option>
+                  <option value="box">Box Plot</option>
+                  <option value="histogram">Histogram</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">X Axis</label>
+                <select
+                  value={xAxis}
+                  onChange={(e) => setXAxis(e.target.value)}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                >
+                  {Object.keys(chartData).map((key) => (
+                    <option key={key} value={key}>{key}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Y Axis</label>
+                <select
+                  value={yAxis}
+                  onChange={(e) => setYAxis(e.target.value)}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2 border"
+                >
+                  {Object.keys(chartData).map((key) => (
+                    <option key={key} value={key}>{key}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="w-full h-[500px]">
+              <Plot
+                data={[
+                  {
+                    x: chartData[xAxis],
+                    y: chartData[yAxis],
+                    type: (chartType === 'line' ? 'scatter' : chartType) as "bar" | "scatter" | "box" | "histogram",
+                    mode: chartType === 'scatter' ? 'markers' : (chartType === 'line' ? 'lines+markers' : undefined),
+                    marker: { color: '#2563eb' },
+                  },
+                ]}
+                layout={{
+                  autosize: true,
+                  title: { text: `${yAxis} vs ${xAxis}` },
+                  xaxis: { title: { text: xAxis } },
+                  yaxis: { title: { text: yAxis } },
+                  margin: { t: 40, r: 20, l: 50, b: 50 },
+                }}
+                useResizeHandler={true}
+                style={{ width: '100%', height: '100%' }}
+              />
+            </div>
+          </div>
+        )}
+
         {analytics && (
           <div className="bg-white p-6 rounded-lg shadow-md mb-8">
             <div className="flex items-center justify-between mb-4">

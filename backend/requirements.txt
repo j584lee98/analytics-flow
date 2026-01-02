@@ -10,3 +10,5 @@ pytest
 httpx
 flake8
 pandas
+numpy
+pydantic
