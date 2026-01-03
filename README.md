@@ -25,7 +25,7 @@ A full-stack application with FastAPI backend, Next.js frontend, and PostgreSQL 
 1.  **Clone the repository** (if you haven't already).
 
 2.  **Environment Variables**:
-    The project comes with default environment variables in `docker-compose.yml` and `backend/main.py` for development. For production, ensure you set secure values. See `.env.example` for reference.
+    The project comes with default environment variables in `docker-compose.yml` and `backend/.env` for development. For production, ensure you set secure values. See `backend/.env.example` for reference.
 
 3.  **Run the Application**:
     You can use the provided `Makefile` for convenience or standard `docker-compose` commands.

@@ -37,3 +37,11 @@ class FileResponse(BaseModel):
 
 class FileUpdate(BaseModel):
     filename: str
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1)
+
+
+class ChatResponse(BaseModel):
+    answer: str

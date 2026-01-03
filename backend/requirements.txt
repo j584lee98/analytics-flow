@@ -12,3 +12,6 @@ flake8
 pandas
 numpy
 pydantic
+langchain
+langchain-openai
+langchain-experimental

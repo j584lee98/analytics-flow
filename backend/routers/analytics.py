@@ -7,8 +7,13 @@ import numpy as np
 from database import get_db
 from models import UserDB, FileDB
 from auth import get_current_user
+from schemas import ChatRequest, ChatResponse
+from chat_agent import get_dataframe_agent, invoke_agent
 
 router = APIRouter()
+
+
+CHAT_MAX_ROWS = int(os.getenv("CHAT_MAX_ROWS", "5000"))
 
 
 @router.get("/analytics/{file_id}")
@@ -106,3 +111,33 @@ def get_file_data(
         raise HTTPException(status_code=500, detail=f"Error reading CSV file: {str(e)}")
 
     return data
+
+
+@router.post("/analytics/{file_id}/chat", response_model=ChatResponse)
+def chat_with_dataset(
+    file_id: str,
+    payload: ChatRequest,
+    current_user: UserDB = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    db_file = db.query(FileDB).filter(FileDB.id == file_id, FileDB.owner_id == current_user.id).first()
+    if not db_file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    if not os.path.exists(db_file.filepath):
+        raise HTTPException(status_code=404, detail="File not found on disk")
+
+    try:
+        df = pd.read_csv(db_file.filepath, nrows=CHAT_MAX_ROWS)
+        df = df.replace({np.nan: None})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading CSV file: {str(e)}")
+
+    try:
+        agent = get_dataframe_agent(user_id=current_user.id, file_id=file_id, df=df)
+        answer = invoke_agent(agent, payload.message)
+    except Exception as e:
+        # Most common cause: missing provider credentials (e.g., OPENAI_API_KEY)
+        raise HTTPException(status_code=500, detail=f"Chat agent error: {str(e)}")
+
+    return ChatResponse(answer=answer)
