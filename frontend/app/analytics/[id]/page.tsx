@@ -4,6 +4,7 @@ import { useEffect, useState, use, ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Sidebar from '../../../components/Sidebar';
+import ChatWidget from '../../../components/ChatWidget';
 import type { PlotParams } from 'react-plotly.js';
 
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false }) as ComponentType<PlotParams>;
@@ -220,6 +221,8 @@ export default function AnalyticsPage({ params }: { params: Promise<{ id: string
             </div>
           </div>
         )}
+
+        <ChatWidget fileId={fileId} title={file?.filename ? `Chat: ${file.filename}` : 'Dataset Agent'} />
 
         {analytics && (
           <div className="bg-white p-6 rounded-lg shadow-md mb-8">
