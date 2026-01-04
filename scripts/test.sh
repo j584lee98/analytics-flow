@@ -6,14 +6,14 @@ echo "Running Backend Tests..."
 # or use docker-compose exec if running against containers
 cd backend
 
-if [ -d "../.venv" ]; then
-    if [ -f "../.venv/Scripts/python.exe" ]; then
-        PYTHON_CMD="../.venv/Scripts/python.exe"
-    elif [ -f "../.venv/bin/python" ]; then
-        PYTHON_CMD="../.venv/bin/python"
-    else
-        PYTHON_CMD="python"
-    fi
+if [ -f ".venv/Scripts/python.exe" ]; then
+    PYTHON_CMD=".venv/Scripts/python.exe"
+elif [ -f ".venv/bin/python" ]; then
+    PYTHON_CMD=".venv/bin/python"
+elif [ -f "../.venv/Scripts/python.exe" ]; then
+    PYTHON_CMD="../.venv/Scripts/python.exe"
+elif [ -f "../.venv/bin/python" ]; then
+    PYTHON_CMD="../.venv/bin/python"
 else
     PYTHON_CMD="python"
 fi
