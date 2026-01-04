@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type ChatRole = 'user' | 'ai';
 
@@ -8,6 +10,50 @@ type ChatMessage = {
   role: ChatRole;
   content: string;
 };
+
+function MarkdownMessage({ content, variant }: { content: string; variant: ChatRole }) {
+  const baseTextClass = variant === 'user' ? 'text-white' : 'text-gray-900';
+  return (
+    <div className={`markdown leading-relaxed ${baseTextClass}`}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          p: ({ children }) => <p className="whitespace-pre-wrap">{children}</p>,
+          a: ({ children, ...props }) => (
+            <a
+              {...props}
+              className="underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {children}
+            </a>
+          ),
+          ul: ({ children }) => <ul className="list-inside list-disc">{children}</ul>,
+          ol: ({ children }) => <ol className="list-inside list-decimal">{children}</ol>,
+          li: ({ children }) => <li className="whitespace-pre-wrap">{children}</li>,
+          code: ({ children }) => (
+            <code className="font-mono text-xs">{children}</code>
+          ),
+          pre: ({ children }) => (
+            <pre className="overflow-x-auto whitespace-pre-wrap rounded-md">
+              {children}
+            </pre>
+          ),
+          strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+          em: ({ children }) => <em>{children}</em>,
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-2 border-gray-200 pl-3">
+              {children}
+            </blockquote>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+}
 
 export default function ChatWidget({
   fileId,
@@ -138,7 +184,7 @@ export default function ChatWidget({
                       : 'max-w-[80%] rounded-2xl bg-white px-3 py-2 text-sm text-gray-900 border border-gray-200'
                   }
                 >
-                  {m.content}
+                  <MarkdownMessage content={m.content} variant={m.role} />
                 </div>
               </div>
             ))}
