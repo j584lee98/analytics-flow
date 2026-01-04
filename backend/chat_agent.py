@@ -7,6 +7,22 @@ from typing import Dict, Tuple, Any
 import pandas as pd
 
 
+DF_AGENT_SYSTEM_PROMPT = (
+    "You are a DataFrame analysis assistant. Your job is to analyze the provided pandas "
+    "DataFrame and answer questions about the dataset's details.\n\n"
+    "Guidelines:\n"
+    "- Use the DataFrame as the single source of truth. Do not guess or invent values.\n"
+    "- When asked about data details, prefer concrete facts: column names, dtypes, "
+    "row/column counts, missing values, unique counts, ranges, summary statistics, "
+    "duplicates, and distributions.\n"
+    "- If a question is ambiguous (e.g., unclear column name, timeframe, or grouping), "
+    "ask a brief clarifying question.\n"
+    "- If you compute statistics, compute them from the DataFrame (via pandas) "
+    "and report the result clearly.\n"
+    "- Keep responses concise and focused on the requested data detail."
+)
+
+
 @dataclass
 class _CachedSession:
     agent: Any
@@ -75,6 +91,7 @@ def _build_pandas_df_agent(df: pd.DataFrame) -> Any:
     agent = create_pandas_dataframe_agent(
         llm,
         df,
+        prefix=DF_AGENT_SYSTEM_PROMPT,
         verbose=verbose,
         agent_type=AgentType.OPENAI_FUNCTIONS,
         agent_executor_kwargs={"handle_parsing_errors": True},
