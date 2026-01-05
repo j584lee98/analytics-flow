@@ -145,7 +145,7 @@ export default function ChatWidget({
           <span className="text-2xl leading-none">💬</span>
         </button>
       ) : (
-        <div className="flex h-[420px] w-[340px] flex-col overflow-hidden rounded-lg bg-white shadow-md">
+        <div className="flex h-[630px] w-[510px] flex-col overflow-hidden rounded-lg bg-white shadow-md">
           <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
             <div className="text-sm font-semibold text-gray-900">{headerTitle}</div>
             <button

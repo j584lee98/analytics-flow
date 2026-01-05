@@ -68,6 +68,17 @@ export default function Home() {
           Your AI-powered platform for dataset analysis and insights.
         </p>
 
+        <div className="mb-8 max-w-3xl text-gray-700">
+          <p className="mb-3">
+            Upload a CSV, generate an analytics page, and chat with an agent that can answer questions about the dataset.
+            This is designed for quick exploration: you can validate columns, spot missing values, and summarize key trends
+            without writing code.
+          </p>
+          <p>
+            Typical workflow: upload → review the generated analytics → ask follow-up questions in the chat on the analytics page.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-2">AI Analytics</h2>
@@ -88,6 +99,11 @@ export default function Home() {
           <p className="text-gray-600 mb-4">
             Upload your dataset to begin analyzing your data.
           </p>
+          <ol className="list-inside list-decimal text-gray-600 mb-4 space-y-1">
+            <li>Upload a CSV from the Upload page.</li>
+            <li>Open the generated analytics page to review summaries and charts.</li>
+            <li>Use chat on the analytics page to ask questions and iterate.</li>
+          </ol>
           <Link
             href="/upload"
             className="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
